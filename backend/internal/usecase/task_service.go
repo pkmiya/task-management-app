@@ -54,11 +54,7 @@ func (s *TaskService) UpdateTaskTitle(id domain.TaskID, rawTitle string) (*domai
 }
 
 func (s *TaskService) DeleteTask(id domain.TaskID) error {
-	err := s.Repo.Delete(id)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.Repo.Delete(id)
 }
 
 // IsNotFound はリポジトリ／ユースケースが返した NotFound を判定する。
