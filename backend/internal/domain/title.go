@@ -23,16 +23,6 @@ func ParseTitle(raw string) (Title, error) {
 	if trimmed == "" {
 		return Title{}, fmt.Errorf("%w: title is empty after trim", ErrValidation)
 	}
-	allSpace := true
-	for _, r := range trimmed {
-		if !unicode.IsSpace(r) {
-			allSpace = false
-			break
-		}
-	}
-	if allSpace {
-		return Title{}, fmt.Errorf("%w: title contains only whitespace characters", ErrValidation)
-	}
 	if utf8.RuneCountInString(trimmed) > 255 {
 		return Title{}, fmt.Errorf("%w: title exceeds 255 Unicode code points", ErrValidation)
 	}
