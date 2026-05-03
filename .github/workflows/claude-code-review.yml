@@ -1,0 +1,48 @@
+# Customized from template via https://qiita.com/aqua_ix/items/ea13034e49afe47b2803
+
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [ opened, synchronize, ready_for_review, reopened ]
+    # Optional: Only run on specific file changes
+    # paths:
+    #   - "src/**/*.ts"
+    #   - "src/**/*.tsx"
+    #   - "src/**/*.js"
+    #   - "src/**/*.jsx"
+
+jobs:
+  claude-review:
+    # Only auto-review PRs opened by repo collaborators (and org owners/members).
+    if: contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'),
+      github.event.pull_request.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        # c.f. https://github.com/actions/checkout/releases
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@e58dfa55559035499a4982426bb73605e8b5ad8e # v1.0.105
+        # c.f. https://github.com/anthropics/claude-code-action/releases
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
+          plugins: "code-review@claude-code-plugins"
+          prompt: >-
+            /code-review:code-review ${{ github.repository }}/pull/${{
+            github.event.pull_request.number }} Your explanation must be in
+            Japanese.
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          # or https://code.claude.com/docs/en/cli-reference for available options
+
